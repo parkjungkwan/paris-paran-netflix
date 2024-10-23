@@ -1,0 +1,374 @@
+#gateway-server
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-server
+  template:
+    metadata:
+      labels:
+        app: gateway-server
+    spec:
+      containers:
+        - name: gateway-server
+          image: songjih452/paran:gateway-latest
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server.default.svc.cluster.local:8888"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: MONGODB_URI
+              value: "mongodb://root:1234@mongodb:27017/parandb"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server.default.svc.cluster.local:8761/eureka/"
+            - name: SPRING_APPLICATION_NAME
+              value: "gateway-server"
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-server
+spec:
+  selector:
+    app: gateway-server
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
+---
+
+#chat-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-service
+  template:
+    metadata:
+      labels:
+        app: chat-service
+    spec:
+      containers:
+        - name: chat-service
+          image: songjih452/paran:chat-latest
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server.default.svc.cluster.local:8888"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: MONGODB_URI
+              value: "mongodb://root:1234@mongodb:27017/parandb"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server.default.svc.cluster.local:8761/eureka/"
+            - name: SPRING_APPLICATION_NAME
+              value: "chat-service"
+          ports:
+            - containerPort: 8081
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-service
+spec:
+  selector:
+    app: chat-service
+  ports:
+    - port: 8081
+      targetPort: 8081
+  type: ClusterIP
+---
+
+# comment-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: comment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: comment-service
+  template:
+    metadata:
+      labels:
+        app: comment-service
+    spec:
+      containers:
+        - name: comment-service
+          image: songjih452/paran:comment-latest
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server.default.svc.cluster.local:8888"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/parandb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server.default.svc.cluster.local:8761/eureka/"
+            - name: SPRING_APPLICATION_NAME
+              value: "comment-service"
+          ports:
+            - containerPort: 8084
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: comment-service
+spec:
+  selector:
+    app: comment-service
+  ports:
+    - port: 8084
+      targetPort: 8084
+  type: ClusterIP
+---
+
+#file-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-service
+  template:
+    metadata:
+      labels:
+        app: file-service
+    spec:
+      containers:
+        - name: file-service
+          image: songjih452/paran:file-latest
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server.default.svc.cluster.local:8888"
+            - name: MONGODB_URI
+              value: "mongodb://root:1234@mongodb:27017/parandb"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server.default.svc.cluster.local:8761/eureka/"
+            - name: SPRING_APPLICATION_NAME
+              value: "file-service"
+          ports:
+            - containerPort: 8090
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: file-service
+spec:
+  selector:
+    app: file-service
+  ports:
+    - port: 8090
+      targetPort: 8090
+  type: ClusterIP
+---
+
+#group-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: group-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: group-service
+  template:
+    metadata:
+      labels:
+        app: group-service
+    spec:
+      containers:
+        - name: group-service
+          image: songjih452/paran:group-latest
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server.default.svc.cluster.local:8888"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/parandb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server.default.svc.cluster.local:8761/eureka/"
+            - name: SPRING_APPLICATION_NAME
+              value: "group-service"
+          ports:
+            - containerPort: 8085
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: group-service
+spec:
+  selector:
+    app: group-service
+  ports:
+    - port: 8085
+      targetPort: 8085
+  type: ClusterIP
+---
+
+#room-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: room-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: room-service
+  template:
+    metadata:
+      labels:
+        app: room-service
+    spec:
+      containers:
+        - name: room-service
+          image: songjih452/paran:room-latest
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server.default.svc.cluster.local:8888"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/parandb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server.default.svc.cluster.local:8761/eureka/"
+            - name: SPRING_APPLICATION_NAME
+              value: "room-service"
+          ports:
+            - containerPort: 8083
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: room-service
+spec:
+  selector:
+    app: room-service
+  ports:
+    - port: 8083
+      targetPort: 8083
+  type: ClusterIP
+---
+
+#user-service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: songjih452/paran:user-latest
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server.default.svc.cluster.local:8888"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/parandb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "1234"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server.default.svc.cluster.local:8761/eureka/"
+            - name: SPRING_APPLICATION_NAME
+              value: "user-service"
+
+          ports:
+            - containerPort: 8082
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user-service
+  ports:
+    - port: 8082
+      targetPort: 8082
+  type: ClusterIP
+---
